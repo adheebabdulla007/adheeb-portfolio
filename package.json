@@ -1,0 +1,8 @@
+{
+  "name": "adheeb-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": { "build": "node scripts/build.mjs", "check": "node --check cinema.js && node --test tests/*.test.mjs" },
+  "engines": { "node": ">=18" }
+}
