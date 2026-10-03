@@ -1,6 +1,7 @@
 import { createRequire } from 'node:module';
 import assert from 'node:assert/strict';
 import { mkdir } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
 const captures = process.env.QA_SCREENSHOTS === '1';
 if (captures) await mkdir(new URL('../qa/', import.meta.url), {recursive:true});
 const require = createRequire(import.meta.url);
@@ -26,7 +27,7 @@ try {
     await page.locator('.portrait-frame img').evaluate(img => img.decode());
     const geometry = await page.evaluate(() => ({width:innerWidth,scroll:document.documentElement.scrollWidth,mode:document.documentElement.dataset.motion,image:document.querySelector('.portrait-frame img').currentSrc,offenders:[...document.querySelectorAll('main *')].filter(e=>{const r=e.getBoundingClientRect();return r.width>0 && r.right>innerWidth+2 && getComputedStyle(e).position!=='absolute';}).slice(0,8).map(e=>e.className)}));
     assert.ok(geometry.scroll <= width+1, name+': horizontal overflow '+JSON.stringify(geometry));
-    if (captures && (name==='desktop'||name==='phone')) await page.screenshot({path:new URL('../qa/atlas-'+name+'.png',import.meta.url).pathname.replace(/^\//,'')});
+    if (captures && (name==='desktop'||name==='phone')) await page.screenshot({path:fileURLToPath(new URL('../qa/atlas-'+name+'.png',import.meta.url))});
     await page.locator('[data-erp="1"]').click();
     assert.equal(await page.locator('[data-erp="1"]').getAttribute('aria-pressed'),'true');
     assert.match(await page.locator('#erp-reading').textContent(),/invoice records/);
@@ -34,7 +35,7 @@ try {
     await path14.evaluate(e=>e.scrollIntoView({block:'center',behavior:'instant'}));
     await path14.click();
     assert.match(await page.locator('#load-status').textContent(),/Path 14 selected/);
-    if (captures && (name==='desktop'||name==='phone')) await page.locator('#erp').screenshot({path:new URL('../qa/atlas-'+name+'-erp.png',import.meta.url).pathname.replace(/^\//,'')});
+    if (captures && (name==='desktop'||name==='phone')) await page.locator('#erp').screenshot({path:fileURLToPath(new URL('../qa/atlas-'+name+'-erp.png',import.meta.url))});
     await page.locator('[data-proof="rotation"]').click();
     assert.equal(await page.locator('#rotation-proof').isVisible(),true);
     assert.equal(await page.locator('#tenant-proof').isVisible(),false);
@@ -43,7 +44,7 @@ try {
     await page.locator('#trace-request').click();
     await page.waitForFunction(()=>!document.querySelector('#trace-request').disabled);
     assert.equal(await page.locator('.trace-active').count(),5);
-    if (captures && (name==='desktop'||name==='phone')) await page.locator('#pursuit').screenshot({path:new URL('../qa/atlas-'+name+'-pursuit.png',import.meta.url).pathname.replace(/^\//,'')});
+    if (captures && (name==='desktop'||name==='phone')) await page.locator('#pursuit').screenshot({path:fileURLToPath(new URL('../qa/atlas-'+name+'-pursuit.png',import.meta.url))});
     await page.locator('[data-voice="transcript"]').click();
     assert.equal(await page.locator('#transcript-panel').isVisible(),true);
     assert.equal(await page.locator('#speech-panel').isVisible(),false);
@@ -52,7 +53,7 @@ try {
     if (captures && (name==='desktop'||name==='phone')) {
       for (const section of ['ownership','ai','atlas']) {
         await page.locator('#'+section).scrollIntoViewIfNeeded();
-        await page.locator('#'+section).screenshot({path:new URL('../qa/atlas-'+name+'-'+section+'.png',import.meta.url).pathname.replace(/^\//,''),animations:'disabled'});
+        await page.locator('#'+section).screenshot({path:fileURLToPath(new URL('../qa/atlas-'+name+'-'+section+'.png',import.meta.url)),animations:'disabled'});
       }
     }
     await page.locator('[data-dialog="message-dialog"]').click();
