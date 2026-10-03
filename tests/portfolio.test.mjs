@@ -4,7 +4,6 @@ import { readFile } from 'node:fs/promises';
 const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
 const js = await readFile(new URL('../cinema.js', import.meta.url), 'utf8');
 const css = await readFile(new URL('../cinema.css', import.meta.url), 'utf8');
-const evidence = await readFile(new URL('../evidence.css', import.meta.url), 'utf8');
 
 test('requested chapter order is preserved', () => {
   const positions = ['erp', 'ownership', 'pursuit', 'ai'].map(id => html.indexOf('id="' + id + '"'));
@@ -27,8 +26,7 @@ test('GitHub evidence is pinned and CI is dated', () => {
 test('motion respects native scroll and user preferences', () => {
   assert.doesNotMatch(js, /addEventListener\(['"](?:wheel|touchmove|scroll)['"]/);
   assert.match(css, /prefers-reduced-motion:reduce/);
-  assert.match(evidence, /prefers-reduced-motion:reduce/);
-  assert.match(evidence, /\[hidden\]\{display:none!important\}/);
+  assert.match(css, /\[hidden\]\{display:none!important\}/);
 });
 test('new-tab links prevent opener access', () => {
   for (const [tag] of html.matchAll(/<a\b[^>]*target="_blank"[^>]*>/g)) assert.match(tag, /rel="[^"]*noopener/);
