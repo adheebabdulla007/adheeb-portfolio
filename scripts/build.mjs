@@ -4,7 +4,7 @@ import path from 'node:path';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const output = path.join(root, 'dist');
-const files = ['index.html', 'cinema.css', 'evidence.css', 'cinema.js', 'assets/adheeb-studio.webp', 'assets/trophy.webp', 'assets/AdheebResume.pdf'];
+const files = ['index.html', 'cinema.css', 'cinema.js', 'assets/adheeb-editorial.webp', 'assets/adheeb-editorial-small.webp', 'assets/trophy.webp', 'assets/AdheebResume.pdf'];
 const html = await readFile(path.join(root, 'index.html'), 'utf8');
 const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
 if (new Set(ids).size !== ids.length) throw new Error('Duplicate HTML ids');

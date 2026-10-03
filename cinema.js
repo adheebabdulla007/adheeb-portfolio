@@ -3,20 +3,75 @@
   const $ = selector => document.querySelector(selector);
   const $$ = selector => [...document.querySelectorAll(selector)];
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
+  const compact = matchMedia('(max-width: 760px), (hover: none), (pointer: coarse)');
+  const connection = navigator.connection;
+  const constrained = () => connection?.saveData || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
+  const motionMode = () => reduced.matches ? 'reduced' : compact.matches || constrained() ? 'compact' : 'full';
+  let mode = motionMode();
+  function updateMotion() {
+    mode = motionMode();
+    document.documentElement.dataset.motion = mode;
+    if (mode !== 'full') resetTrophy();
+    if (mode === 'reduced') {
+      $$('.reveal').forEach(node => node.classList.add('visible'));
+      clearTrace();
+    }
+  }
+  reduced.addEventListener('change', updateMotion);
+  compact.addEventListener('change', updateMotion);
+  connection?.addEventListener?.('change', updateMotion);
 
-  // These controls explain repository behaviour; they never call a backend.
-  let traceTimer;
-  $('#trace-request').addEventListener('click', () => {
-    const map = $('.system-map');
-    clearTimeout(traceTimer);
-    map.classList.remove('tracing');
-    $('#trace-status').textContent = 'Request → identity checks → résumé, application and event.';
-    if (!reduced.matches) requestAnimationFrame(() => requestAnimationFrame(() => map.classList.add('tracing')));
-    traceTimer = setTimeout(() => {
-      map.classList.remove('tracing');
-      $('#trace-status').textContent = 'Source-based diagram. Database and message writes are currently separate.';
-    }, 3400);
+  const erpDescriptions = [
+    'Calculation feeds the invoice, stock movement and financial records.',
+    'The invoice records the sale and connects it to stock and accounts.',
+    'Stock movement connects the sold item to the transaction and its financial records.',
+    'Accounts holds the financial records connected to the sale.'
+  ];
+  $$('[data-erp]').forEach(button => button.addEventListener('click', () => {
+    const step = Number(button.dataset.erp);
+    $$('[data-erp]').forEach((node, index) => {
+      node.setAttribute('aria-pressed', String(index === step));
+      node.classList.toggle('is-active', index === step);
+      node.classList.toggle('is-linked', index > step);
+    });
+    $('#erp-reading').textContent = erpDescriptions[step];
+    $('.trace-marker').textContent = step === 3 ? '04' : '0' + (step + 1) + '—04';
+  }));
+  $$('.selectable button').forEach(button => button.addEventListener('click', () => {
+    $$('.selectable button').forEach(node => node.setAttribute('aria-pressed', String(node === button)));
+    $('#load-status').textContent = 'Path ' + button.textContent + ' selected · loaded when opened';
+  }));
+
+  // These are diagrams of inspected source, not live backend operations.
+  const traceTimers = new Set();
+  const traceButton = $('#trace-request');
+  const traceNodes = $$('.system-node');
+  function clearTrace() {
+    traceTimers.forEach(clearTimeout);
+    traceTimers.clear();
+    traceNodes.forEach(node => node.classList.remove('trace-active'));
+    traceButton.disabled = false;
+    $('#trace-status').textContent = 'Source-based diagram. Database and message writes are currently separate.';
+  }
+  traceButton.addEventListener('click', () => {
+    clearTrace();
+    if (mode === 'reduced') {
+      traceNodes.forEach(node => node.classList.add('trace-active'));
+      $('#trace-status').textContent = 'React → identity and ownership → résumé file, application record and background event. Database and message writes are separate.';
+      return;
+    }
+    traceButton.disabled = true;
+    const descriptions = ['React sends the résumé and job.', 'The API checks identity and ownership.', 'The résumé file goes to Blob Storage.', 'SQL Server stores the application.', 'RabbitMQ receives the background event. Database and message writes are separate.'];
+    const interval = mode === 'compact' ? 150 : 420;
+    traceNodes.forEach((node, index) => {
+      const timer = setTimeout(() => {
+        traceTimers.delete(timer);
+        node.classList.add('trace-active');
+        $('#trace-status').textContent = descriptions[index];
+        if (index === traceNodes.length - 1) traceButton.disabled = false;
+      }, interval * index);
+      traceTimers.add(timer);
+    });
   });
   $$('[data-proof]').forEach(button => button.addEventListener('click', () => {
     const tenant = button.dataset.proof === 'tenant';
@@ -25,158 +80,86 @@
     $('#rotation-proof').hidden = tenant;
     $('#proof-source-link').href = 'https://github.com/adheebabdulla007/pursuit/blob/5a6c4139adac69606f55811e3430d034b4234c73/tests/Pursuit.IntegrationTests/' + (tenant ? 'TenantIsolation/ApplicationTenantIsolationTests.cs' : 'Auth/AuthRefreshTokenTests.cs');
   }));
-
-  $$('.load-blocks').forEach(node => {
-    for (let i = 0; i < 14; i++) {
-      const block = document.createElement('i');
-      block.setAttribute('aria-hidden', 'true');
-      node.append(block);
-    }
-  });
-  // Fixed, illustrative footprint. No branch-specific business data is represented.
-  for (let i = 0; i < 13; i++) {
-    const branch = document.createElement('div');
-    branch.className = 'branch-building';
-    branch.style.setProperty('--branch', i);
-    branch.innerHTML = `<svg viewBox="0 0 40 38" aria-hidden="true"><path d="M7 34V12L20 4l13 8v22H7Z" fill="#2a402c" stroke="currentColor" stroke-width="1.1"/><path d="M7 12h26M20 4v8M13 18h4m6 0h4m-14 6h4m6 0h4M18 34v-5h5v5" fill="none" stroke="currentColor" stroke-width="1.1"/></svg><span>${String(i + 1).padStart(2, '0')}</span>`;
-    $('#branch-field').append(branch);
-  }
-  for (let i = 0; i < 38; i++) {
-    const bar = document.createElement('i');
-    bar.style.setProperty('--height', `${18 + Math.abs(Math.sin(i * 1.27) * Math.cos(i * .32)) * 108}px`);
-    $('#waveform').append(bar);
-  }
-
-  function select(group, attribute, callback) {
-    const buttons = $$(group);
-    buttons.forEach(button => button.addEventListener('click', () => {
-      buttons.forEach(item => item.setAttribute('aria-pressed', String(item === button)));
-      callback(button.dataset[attribute]);
-    }));
-  }
-  const voices = {
-    speech: ['∿', 'Spoken input starts the abusive-language detection workflow.'],
-    transcript: ['Aa', 'Google Speech-to-Text produces the words. Transcription errors affect the next stage.'],
-    svm: ['{ }', 'The SVM classifies the transcript. My work included training, testing and evaluation.']
+  const voiceDescriptions = {
+    speech: 'Method illustration · training, testing and evaluation were part of my work.',
+    transcript: 'Transcription turns audio into words. Errors here affect the classifier.',
+    svm: 'SVM classifies the transcript. The points illustrate a boundary, not measured results.'
   };
-  select('[data-voice]', 'voice', key => {
-    const [symbol, copy] = voices[key];
-    $('.speech-study').dataset.mode = key;
-    $('#voice-symbol').textContent = symbol;
-    $('#voice-caption').textContent = copy;
-  });
-  const health = {
-    data: ['{ }', 'Healthcare data', 'Healthcare dataset preparation for appointment-booking R&D.'],
-    model: ['◇', 'Model selection', 'Research and compare approaches for an appointment-booking conversation.'],
-    evaluate: ['↻', 'Training + evaluation', 'Train, test and evaluate models against the intended healthcare requests.'],
-    flow: ['↳', 'Conversation flow', 'Understand what a caller needs and how the appointment conversation should progress.']
-  };
-  select('[data-health]', 'health', key => {
-    const [icon, title, copy] = health[key];
-    $('#health-icon').textContent = icon;
-    $('#health-title').textContent = title;
-    $('#health-copy').textContent = copy;
-  });
-
-  // Replays are finite CSS sequences. Scrolling and gestures remain browser-native.
-  const replayTimers = new Map();
-  function playScene(scene, button) {
-    if (reduced.matches) return;
-    scene.classList.remove('is-playing');
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      if (reduced.matches) return;
-      scene.classList.add('is-playing');
-    }));
-    if (!button) return;
-    clearTimeout(replayTimers.get(button));
-    button.disabled = true;
-    button.innerHTML = 'Playing <span>↻</span>';
-    replayTimers.set(button, setTimeout(() => {
-      button.disabled = false;
-      button.innerHTML = 'Replay <span>↻</span>';
-      replayTimers.delete(button);
-    }, 3900));
-  }
-  $$('[data-replay]').forEach(button => button.addEventListener('click', () => {
-    playScene(document.querySelector(`[data-scene="${button.dataset.replay}"]`), button);
+  $$('[data-voice]').forEach(button => button.addEventListener('click', () => {
+    $$('[data-voice]').forEach(item => {
+      const active = item === button;
+      item.setAttribute('aria-pressed', String(active));
+      $('#' + item.dataset.voice + '-panel').hidden = !active;
+    });
+    $('#voice-caption').textContent = voiceDescriptions[button.dataset.voice];
   }));
 
+  // Observe entry, not every scroll event. There are no pinned chapters or gesture intercepts.
   if ('IntersectionObserver' in window) {
     document.documentElement.classList.add('js');
     const revealObserver = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (!entry.isIntersecting) return;
-        entry.target.classList.add('visible');
+        entry.target.classList.add('visible', 'is-visible');
         revealObserver.unobserve(entry.target);
       });
     }, { threshold: .08 });
-    if (!reduced.matches) $$('.reveal').forEach(node => {
-      if (node.getBoundingClientRect().top > innerHeight * .9) {
+    $$('.reveal, .handoff').forEach(node => {
+      if (reduced.matches || node.getBoundingClientRect().top < innerHeight * .9) node.classList.add('visible', 'is-visible');
+      else {
         node.classList.add('ready');
         revealObserver.observe(node);
       }
     });
-    const sceneObserver = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        if (entry.target.matches('.award')) entry.target.classList.add('in-view');
-        else playScene(entry.target);
-        sceneObserver.unobserve(entry.target);
+    const dock = $('.atlas-dock');
+    new IntersectionObserver(entries => {
+      const entry = entries[0];
+      dock.classList.toggle('is-visible', !entry.isIntersecting && entry.boundingClientRect.top < 0);
+    }).observe($('#home'));
+    const chapters = new Map();
+    // A shared observer tracks all four chapters, including direct hash navigation.
+    const chapterObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => chapters.set(entry.target.id, entry.isIntersecting));
+      const current = [...chapters].find(([, visible]) => visible)?.[0];
+      if (!current) return;
+      $$('.atlas-dock a').forEach(link => {
+        if (link.hash === '#' + current) link.setAttribute('aria-current', 'true');
+        else link.removeAttribute('aria-current');
       });
-    }, { threshold: .22 });
-    $$('.scene, .award').forEach(node => sceneObserver.observe(node));
-    // Tall phone layouts start each visual beat when it actually enters view.
-    const beatObserver = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('motion-visible');
-        beatObserver.unobserve(entry.target);
-      });
-    }, { threshold: .22 });
-    $$('.transaction-stop, .source-records, .application-engine, .branch-destination, .candidate-side, .journey-bridge, .employer-side').forEach(node => beatObserver.observe(node));
-    reduced.addEventListener('change', event => {
-      if (!event.matches) return;
-      $$('.reveal').forEach(node => node.classList.add('visible'));
-      revealObserver.disconnect();
-      $$('.scene').forEach(node => node.classList.remove('is-playing'));
-      resetTrophy();
-    });
+    }, { rootMargin: '-12% 0px -55% 0px', threshold: 0 });
+    $$('[data-chapter]').forEach(node => chapterObserver.observe(node));
   }
 
-  // One frame per pointer change, only while the trophy is being inspected.
   const trophy = $('.trophy-button');
   const art = $('.trophy-art');
-  let trophyBounds = null;
-  let tiltFrame = 0;
-  let pointerX = 0;
-  let pointerY = 0;
+  let bounds = null, tiltFrame = 0, pointerX = 0, pointerY = 0;
   function resetTrophy() {
     cancelAnimationFrame(tiltFrame);
     tiltFrame = 0;
-    trophyBounds = null;
+    bounds = null;
     art.style.removeProperty('--tilt-x');
     art.style.removeProperty('--tilt-y');
   }
   trophy.addEventListener('pointerenter', event => {
-    if (!finePointer.matches || reduced.matches || event.pointerType === 'touch') return;
-    trophyBounds = trophy.getBoundingClientRect();
+    if (mode === 'full' && event.pointerType !== 'touch') bounds = trophy.getBoundingClientRect();
   });
   trophy.addEventListener('pointermove', event => {
-    if (!trophyBounds || reduced.matches) return;
-    pointerX = event.clientX;
-    pointerY = event.clientY;
+    if (!bounds || mode !== 'full') return;
+    pointerX = event.clientX; pointerY = event.clientY;
     if (tiltFrame) return;
     tiltFrame = requestAnimationFrame(() => {
       tiltFrame = 0;
-      if (!trophyBounds) return;
-      const x = Math.max(-.5, Math.min(.5, (pointerX - trophyBounds.left) / trophyBounds.width - .5));
-      const y = Math.max(-.5, Math.min(.5, (pointerY - trophyBounds.top) / trophyBounds.height - .5));
-      art.style.setProperty('--tilt-x', `${-y * 8}deg`);
-      art.style.setProperty('--tilt-y', `${x * 12}deg`);
+      if (!bounds) return;
+      const x = Math.max(-.5, Math.min(.5, (pointerX - bounds.left) / bounds.width - .5));
+      const y = Math.max(-.5, Math.min(.5, (pointerY - bounds.top) / bounds.height - .5));
+      art.style.setProperty('--tilt-x', -y * 6 + 'deg');
+      art.style.setProperty('--tilt-y', x * 10 + 'deg');
     });
   });
   trophy.addEventListener('pointerleave', resetTrophy);
   trophy.addEventListener('pointercancel', resetTrophy);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { clearTrace(); resetTrophy(); } });
+  updateMotion();
 
   // Native dialogs provide focus containment and Escape behavior.
   const dialogTriggers = new WeakMap();

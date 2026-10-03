@@ -1,48 +1,52 @@
-# Adheeb Abdulla V P portfolio
+# Adheeb Abdulla V P — portfolio
 
-Static HTML, CSS and JavaScript. No runtime dependencies, analytics, cookies, external fonts or backend services.
+A dependency-free static portfolio: HTML, CSS and JavaScript. No analytics, cookies, third-party fonts, runtime packages or backend.
 
-## Develop
+## Develop and verify
 
-Use Node.js 22 and a static HTTP server.
+Use Node.js 22 or newer.
 
 ```sh
-npm run check
-npm run build
-python -m http.server 8765 --bind 127.0.0.1 --directory dist
+node --check cinema.js
+node --test tests/portfolio.test.mjs
+node scripts/build.mjs
+node scripts/serve.mjs
 ```
 
-Open http://127.0.0.1:8765. Reload after edits.
+Preview: http://127.0.0.1:8766. The preview server binds to localhost, serves only dist, and is not a production server. The equivalent npm scripts are check, build and preview.
+
+Optional browser regression checks require Playwright as a developer tool and an installed Chrome or Edge. With the preview running, execute `node tests/browser-check.mjs` (Chrome), or `node tests/browser-check.mjs msedge`. Set `PLAYWRIGHT_MODULE` to an external Playwright installation if it is not locally installed. `QA_SCREENSHOTS=1` saves optional captures into ignored `qa/`; captures never enter the build.
 
 ## Release
 
-GitHub Actions runs syntax checks, eight content/structure tests and the production build on pushes and pull requests. Build output is restricted to seven allowlisted files. Only deploy `dist/`, never the repository root. No environment variables or keys are required.
+GitHub Actions checks syntax, content boundaries and the production build. Only deploy dist/. Seven files are allowlisted; original photographs, research, QA captures and documents cannot enter the build. All application URLs are relative, including responsive images, so project-path static hosting is supported. No environment variables or secrets are needed.
 
-The local Sites checkout contains its hosting manifest. It is omitted from the provider-neutral GitHub source export. Any static host can serve `dist/` over HTTPS.
+The manually dispatched Publish portfolio workflow deploys the verified artifact to GitHub Pages after Pages is configured to use GitHub Actions. A successful build does not mean the site has been published.
 
-Check desktop and phone widths, keyboard navigation, dialogs, contact draft validation, image loading and browser errors before each release. Automated tests are static checks, not an accessibility audit or a cross-browser performance guarantee.
+## Design and interactions
 
-## Evidence and content boundaries
+- Editorial portrait with two work fragments; face displayed at a bounded size. Responsive WebP sources at 544 and 1086 pixels wide.
+- An engineering atlas links the four chapters in the requested order: ERP, GCC ownership, Pursuit, AI.
+- ERP selectors trace downstream connections. The loading study contrasts 14 startup paths with on-demand access; individual paths can be selected.
+- GCC visualizes record mapping, application ownership, 13 branches and one head office. The trophy can be inspected.
+- Pursuit has request tracing, two source-linked test cases and a dated CI snapshot.
+- Speech, transcription and SVM stages use different visual representations. The healthcare story shows research stages.
+- Chapter handoffs branch, converge and change into a signal. Entry animations run once. There are no scroll handlers, wheel interception, pinned scenes or animation loops.
+- Compact motion applies to touch/small screens, data-saving connections and low reported CPU counts. Reduced-motion preferences remove animation. This is a conservative heuristic, not a device performance benchmark.
+- Native dialogs support Escape and return focus. Contact controls prepare drafts only.
 
-- ERP and GCC are company work with private source. Diagrams describe scope without software screens or customer records.
-- Sole ownership concerns the GCC onboarding application, within a wider team delivery.
-- 130K+ records describes a point during the work, not a final total. The 14 on-demand loading paths and award date are supplied career facts, not public benchmarks.
-- Pursuit diagrams link to commit `5a6c4139adac69606f55811e3430d034b4234c73`. Tenant access and refresh-token diagrams summarize test assertions; they do not execute the backend.
-- CI snapshot: GitHub Actions run 36817898440, 1 October 2026. Backend, frontend and browser jobs succeeded. This is not a continuously refreshed badge.
-- No UI screenshots are included. The product is represented by an application journey, request diagram and test diagrams.
-- Pursuit remains in development. The linked roadmap records limits including separate database/message writes, dependency readiness checks and server-side limits.
-- No AI accuracy, dataset-size or production-deployment claims are made.
+## Evidence boundaries
 
-## Images
+ERP and GCC are company work with private source. Figures are supplied career facts, not publicly audited metrics. The 14-path comparison describes a loading strategy; no measured time improvement is claimed. The 130K+ figure is a point during the work, not a final total. Sole ownership refers to the GCC onboarding application within a wider team delivery.
 
-Portrait and trophy are AI-assisted edits of user-provided photographs. Background, lighting and clothing presentation were edited; these are not untouched documentary photographs. Original group/desk photographs and the original portrait are excluded from the public build and clean GitHub export.
+Pursuit diagrams link to inspected commit 5a6c4139adac69606f55811e3430d034b4234c73. Company-access and refresh-token visuals summarize actual test assertions; the portfolio never runs the backend. The CI result is a dated snapshot (1 October 2026, run 36817898440). Newer commits may differ. Database/message writes are separate in the illustrated snapshot.
 
-The portrait is 1672 × 941. Desktop rendering is capped at 1100 CSS pixels without animated zoom. This reduces enlargement but does not create native 4K detail. A trial replacement was rejected because it added no native resolution and introduced facial variation.
+AI visuals explain methods; no accuracy, dataset-size or production deployment claim is made. No UI screenshots, customer records, patient data, group photographs or ID cards are included.
 
-## Motion and accessibility
+## Assets and QA
 
-Native document scrolling; no wheel interception or pinned chapters. Finite ERP/GCC sequences, request tracing, test-state transitions, trophy light and pointer tilt. Reduced-motion preferences disable animation. Native dialogs support Escape and return focus to their trigger. The contact composer prepares drafts only.
+See ASSET-PROVENANCE.md for image treatment and the generation prompt. See RELEASE-CHECKLIST.md for verification coverage and limitations. Personal photographs, résumé and identifying content belong to Adheeb Abdulla V P.
 
-## Ownership
+## Rollback
 
-Personal photographs, résumé and identifying content belong to Adheeb Abdulla V P. No permission to reuse these assets or impersonate the owner is granted.
+Revert the release commit, rebuild, and redeploy a previously checked artifact. Do not rewrite public Git history.
