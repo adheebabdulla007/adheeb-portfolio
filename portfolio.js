@@ -1,4 +1,22 @@
 document.documentElement.classList.add('js');
+const technology=document.querySelector('.technology');
+const techTrack=technology.querySelector('.tech-track');
+const techCopy=techTrack.firstElementChild.cloneNode(true);
+techCopy.setAttribute('aria-hidden','true');
+techTrack.append(techCopy);
+const techPause=technology.querySelector('.tech-pause');
+techPause.hidden=false;
+techPause.addEventListener('click',()=>{
+ const paused=technology.classList.toggle('is-paused');
+ techPause.setAttribute('aria-pressed',String(paused));
+ techPause.setAttribute('aria-label',paused?'Resume technology motion':'Pause technology motion');
+ techPause.textContent=paused?'Resume motion ▶':'Pause motion Ⅱ';
+});
+let technologyVisible=true;
+function updateTechnologyVisibility(){technology.classList.toggle('is-visible',technologyVisible&&!document.hidden);}
+if('IntersectionObserver' in window){new IntersectionObserver(entries=>{technologyVisible=entries[0].isIntersecting;updateTechnologyVisibility();}).observe(technology);}
+document.addEventListener('visibilitychange',updateTechnologyVisibility);
+updateTechnologyVisibility();
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 const cinematic=matchMedia('(min-width: 1100px) and (min-height: 760px) and (prefers-reduced-motion: no-preference)');
 const menuButton=document.querySelector('.menu-toggle'),menu=document.querySelector('#mobile-menu');

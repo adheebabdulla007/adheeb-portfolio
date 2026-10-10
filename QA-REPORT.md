@@ -1,4 +1,12 @@
-# Portfolio release verification — 9 October 2026
+# Portfolio release verification — updated 10 October 2026
+
+## Technology ribbon and résumé update
+- Existing headings retained. Modern .NET 10, ASP.NET Core and EF Core made explicit in introduction and Pursuit copy.
+- Fifteen locally hosted, original-color logo assets; official modern .NET brand mark. Loop uses CSS transforms, pauses offscreen and in hidden tabs, includes pause/resume, and becomes a fully visible wrapped list for reduced motion or no JavaScript. Duplicate visual list is hidden from assistive technology.
+- Supplied 7 October master résumé replaces the older PDF unchanged. View endpoint and actual browser downloads checked against SHA-256 5A751AA3F34DBCEC80103A72941FA2BF38739109B88A2CB3552181B4993945D2. The earlier reported viewer failure was not reproduced; an explicit download is now available as a fallback.
+- Full 33-configuration responsive/accessibility suite rerun successfully; 12 additional Chromium/Firefox/WebKit scenarios at 320, 390, 768 and 1440px check animation, pause/resume, reduced motion, image decoding, overflow and résumé bytes.
+- Desktop and phone ribbon screenshots visually inspected. Updated production build: 27 public files, approximately 627 KiB including résumé.
+- Timing measurements below describe the earlier 9 October build, not a new performance measurement of the ribbon update.
 
 ## Local result
 Passed: 5 source/build checks, 33 browser configurations, and 5 resilience scenarios.

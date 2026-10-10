@@ -4,7 +4,7 @@ import path from 'node:path';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const output = path.join(root, 'dist');
-const files = ['index.html', '404.html', 'design-tokens.css', 'portfolio.css', 'portfolio.js', 'assets/Adheeb.Photo.jpeg', 'assets/trophy.webp', 'assets/AdheebResume.pdf', 'assets/icon.svg', 'assets/inter-latin-wght-normal.woff2', 'assets/inter-OFL.txt'];
+const files = ['index.html', '404.html', 'design-tokens.css', 'portfolio.css', 'portfolio.js', 'assets/Adheeb.Photo.jpeg', 'assets/trophy.webp', 'assets/AdheebResume.pdf', 'assets/icon.svg', 'assets/inter-latin-wght-normal.woff2', 'assets/inter-OFL.txt', 'assets/devicon-LICENSE.txt', 'assets/tech-csharp.svg', 'assets/tech-dotnetcore.svg', 'assets/tech-entityframeworkcore.svg', 'assets/tech-microsoftsqlserver.svg', 'assets/tech-redis.svg', 'assets/tech-rabbitmq.svg', 'assets/tech-react.svg', 'assets/tech-typescript.svg', 'assets/tech-tailwindcss.svg', 'assets/tech-vite.svg', 'assets/tech-docker.svg', 'assets/tech-azure.svg', 'assets/tech-githubactions.svg', 'assets/tech-vitest.svg', 'assets/tech-playwright.svg'];
 const html = await readFile(path.join(root, 'index.html'), 'utf8');
 const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
 if (new Set(ids).size !== ids.length) throw new Error('Duplicate HTML ids');

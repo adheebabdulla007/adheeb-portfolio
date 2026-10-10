@@ -1,9 +1,12 @@
 # Public asset provenance
 - assets/Adheeb.Photo.jpeg: owner-supplied real portrait, byte-for-byte copy from the prior release. Facial features unchanged; displayed with CSS crop only.
 - assets/trophy.webp: existing approved trophy illustration derived from the owner's photograph; no group photograph is included.
-- assets/AdheebResume.pdf: supplied résumé preserved unchanged.
+- assets/AdheebResume.pdf: replaced with the owner-supplied Master Resume/AdheebAbdullaResume.pdf on 10 October 2026, unchanged. SHA-256: 5A751AA3F34DBCEC80103A72941FA2BF38739109B88A2CB3552181B4993945D2.
+- assets/tech-*.svg: original-color technology marks from https://github.com/devicons/devicon/tree/master/icons, retrieved 10 October 2026; MIT license included as assets/devicon-LICENSE.txt. Logos identify technologies, do not imply endorsement, and remain the property of their respective owners. No recoloring or custom redraws.
+- Technology scope checked against the current local Pursuit project files: API and Infrastructure package references, client/package.json, docker-compose.yml and CI workflows. This identifies tools in use, not new claims of deployed services or equal proficiency in every tool.
 - assets/inter-latin-wght-normal.woff2: existing self-hosted Inter variable font, licensed under SIL OFL; license included.
 - Georgia: system font; no additional download.
+- Exception to Devicon provenance: assets/tech-dotnetcore.svg contains the current official .NET logo from https://github.com/dotnet/brand/blob/main/logo/dotnet-logo.svg, unchanged. Copyright belongs to the .NET authors; used to identify .NET per the brand repository's related-content guidance.
 - assets/icon.svg: original simple letterform favicon.
 - Workflow diagrams: original HTML/CSS/SVG explanations, not product screenshots.
 - No Hitit images, code, fonts or exact palette were copied.
