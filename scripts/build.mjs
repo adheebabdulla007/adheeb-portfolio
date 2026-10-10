@@ -4,7 +4,7 @@ import path from 'node:path';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const output = path.join(root, 'dist');
-const files = ['index.html', 'cinema.css', 'cinema.js', 'assets/adheeb-editorial.webp', 'assets/adheeb-editorial-small.webp', 'assets/trophy.webp', 'assets/AdheebResume.pdf'];
+const files = ['index.html', '404.html', 'design-tokens.css', 'portfolio.css', 'portfolio.js', 'assets/Adheeb.Photo.jpeg', 'assets/trophy.webp', 'assets/AdheebResume.pdf', 'assets/icon.svg', 'assets/inter-latin-wght-normal.woff2', 'assets/inter-OFL.txt'];
 const html = await readFile(path.join(root, 'index.html'), 'utf8');
 const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
 if (new Set(ids).size !== ids.length) throw new Error('Duplicate HTML ids');
@@ -14,7 +14,7 @@ for (const [, hash] of html.matchAll(/href="#([^"]+)"/g)) {
 for (const [, target] of html.matchAll(/data-dialog="([^"]+)"/g)) {
   if (!ids.includes(target)) throw new Error(`Missing dialog: ${target}`);
 }
-for (const [, asset] of html.matchAll(/(?:src|href)="((?:assets\/|cinema\.)[^"]+)"/g)) {
+for (const [, asset] of html.matchAll(/(?:src|href)="((?:assets\/|portfolio\.|design-tokens\.)[^"]+)"/g)) {
   if (!files.includes(asset.split('?')[0])) throw new Error(`Unlisted public asset: ${asset}`);
 }
 async function checkExisting(dir, relative = '') {

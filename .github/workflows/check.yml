@@ -1,18 +1,33 @@
 name: Portfolio checks
 on:
   push:
-    branches: [main]
+    branches: [main, codex/hitit-portfolio-final]
   pull_request:
 permissions:
   contents: read
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '10.13.1'
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: npm run check
-      - run: npm run build
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
+      - run: pnpm run check
+      - run: pnpm exec playwright install --with-deps chromium firefox webkit
+      - run: |
+          pnpm run preview &
+          curl --retry 20 --retry-delay 1 --retry-connrefused -fsS http://127.0.0.1:8777/ -o /dev/null
+          pnpm run test:browser
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-verification
+          path: qa/

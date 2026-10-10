@@ -1,8 +1,9 @@
 {
   "name": "adheeb-portfolio",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
-  "scripts": { "build": "node scripts/build.mjs", "check": "node --check cinema.js && node --test tests/*.test.mjs", "preview": "node scripts/serve.mjs" },
-  "engines": { "node": ">=18" }
+  "scripts": { "build": "node scripts/build.mjs", "check": "node --check portfolio.js && node --test tests/release.test.mjs", "test:browser":"node tests/release-browser.mjs", "preview": "node scripts/serve.mjs" },
+  "engines": { "node": ">=22" },
+  "devDependencies": { "playwright": "1.63.0", "axe-core": "4.11.0" }
 }
