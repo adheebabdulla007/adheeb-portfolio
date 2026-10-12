@@ -18,6 +18,7 @@ for(const [name,engine] of Object.entries({chromium,firefox,webkit})){
   assert.notEqual(await track.evaluate(el=>getComputedStyle(el).transform),before,'Strip moves');
   await page.getByRole('button',{name:'Pause technology motion'}).click();
   await page.waitForFunction(()=>getComputedStyle(document.querySelector('.tech-track')).animationPlayState==='paused');
+  await page.waitForTimeout(100);
   const paused=await track.evaluate(el=>getComputedStyle(el).transform);
   await page.waitForTimeout(200);
   assert.equal(await track.evaluate(el=>getComputedStyle(el).transform),paused,'Pause stops motion');
