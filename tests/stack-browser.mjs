@@ -17,10 +17,12 @@ for(const [name,engine] of Object.entries({chromium,firefox,webkit})){
   await page.waitForTimeout(250);
   assert.notEqual(await track.evaluate(el=>getComputedStyle(el).transform),before,'Strip moves');
   await page.getByRole('button',{name:'Pause technology motion'}).click();
+  await page.waitForFunction(()=>getComputedStyle(document.querySelector('.tech-track')).animationPlayState==='paused');
   const paused=await track.evaluate(el=>getComputedStyle(el).transform);
   await page.waitForTimeout(200);
   assert.equal(await track.evaluate(el=>getComputedStyle(el).transform),paused,'Pause stops motion');
   await page.getByRole('button',{name:'Resume technology motion'}).click();
+  await page.waitForFunction(()=>getComputedStyle(document.querySelector('.tech-track')).animationPlayState==='running');
   await page.waitForTimeout(200);
   assert.notEqual(await track.evaluate(el=>getComputedStyle(el).transform),paused,'Resume restarts motion');
   assert.ok(await page.locator('.tech-list img').evaluateAll(images=>images.every(img=>img.complete&&img.naturalWidth>0)),'Every logo decodes');
