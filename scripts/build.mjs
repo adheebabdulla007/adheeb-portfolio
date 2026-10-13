@@ -4,15 +4,15 @@ import path from 'node:path';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const output = path.join(root, 'dist');
-const files = ['index.html', '404.html', 'design-tokens.css', 'portfolio.css', 'portfolio.js', 'assets/Adheeb.Photo.jpeg', 'assets/trophy.webp', 'assets/AdheebResume.pdf', 'assets/icon.svg', 'assets/inter-latin-wght-normal.woff2', 'assets/inter-OFL.txt', 'assets/devicon-LICENSE.txt', 'assets/tech-csharp.svg', 'assets/tech-dotnetcore.svg', 'assets/tech-entityframeworkcore.svg', 'assets/tech-microsoftsqlserver.svg', 'assets/tech-redis.svg', 'assets/tech-rabbitmq.svg', 'assets/tech-react.svg', 'assets/tech-typescript.svg', 'assets/tech-tailwindcss.svg', 'assets/tech-vite.svg', 'assets/tech-docker.svg', 'assets/tech-azure.svg', 'assets/tech-githubactions.svg', 'assets/tech-vitest.svg', 'assets/tech-playwright.svg'];
+const files = ['index.html', '404.html', 'refinements.css', 'portfolio.css', 'portfolio.js', 'assets/Adheeb.Photo.jpeg', 'assets/trophy.webp', 'assets/AdheebResume.pdf', 'assets/icon.svg', 'assets/manrope-400.ttf', 'assets/manrope-600.ttf', 'assets/spacegrotesk-500.ttf', 'assets/spacegrotesk-600.ttf', 'assets/manrope-OFL.txt', 'assets/spacegrotesk-OFL.txt', 'assets/devicon-LICENSE.txt', 'assets/tech-csharp.svg', 'assets/tech-dotnetcore.svg', 'assets/tech-entityframeworkcore.svg', 'assets/tech-microsoftsqlserver.svg', 'assets/tech-redis.svg', 'assets/tech-rabbitmq.svg', 'assets/tech-react.svg', 'assets/tech-typescript.svg', 'assets/tech-tailwindcss.svg', 'assets/tech-vite.svg', 'assets/tech-docker.svg', 'assets/tech-azure.svg', 'assets/tech-githubactions.svg', 'assets/tech-vitest.svg', 'assets/tech-playwright.svg'];
 const html = await readFile(path.join(root, 'index.html'), 'utf8');
 const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
 if (new Set(ids).size !== ids.length) throw new Error('Duplicate HTML ids');
 for (const [, hash] of html.matchAll(/href="#([^"]+)"/g)) {
   if (!ids.includes(hash)) throw new Error(`Missing anchor target: ${hash}`);
 }
-for (const [, target] of html.matchAll(/data-dialog="([^"]+)"/g)) {
-  if (!ids.includes(target)) throw new Error(`Missing dialog: ${target}`);
+for (const [, target] of html.matchAll(/data-open="([^"]+)"/g)) {
+  if (!ids.includes(target)) throw new Error(`Missing disclosure: ${target}`);
 }
 for (const [, asset] of html.matchAll(/(?:src|href)="((?:assets\/|portfolio\.|design-tokens\.)[^"]+)"/g)) {
   if (!files.includes(asset.split('?')[0])) throw new Error(`Unlisted public asset: ${asset}`);

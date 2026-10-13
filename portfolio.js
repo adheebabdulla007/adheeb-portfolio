@@ -1,72 +1,184 @@
 document.documentElement.classList.add('js');
-const technology=document.querySelector('.technology');
-const techTrack=technology.querySelector('.tech-track');
-const techCopy=techTrack.firstElementChild.cloneNode(true);
-techCopy.setAttribute('aria-hidden','true');
-techTrack.append(techCopy);
-const techPause=technology.querySelector('.tech-pause');
-techPause.hidden=false;
-techPause.addEventListener('click',()=>{
- const paused=technology.classList.toggle('is-paused');
- techPause.setAttribute('aria-pressed',String(paused));
- techPause.setAttribute('aria-label',paused?'Resume technology motion':'Pause technology motion');
- techPause.textContent=paused?'Resume motion ▶':'Pause motion Ⅱ';
-});
-let technologyVisible=true;
-function updateTechnologyVisibility(){technology.classList.toggle('is-visible',technologyVisible&&!document.hidden);}
-if('IntersectionObserver' in window){new IntersectionObserver(entries=>{technologyVisible=entries[0].isIntersecting;updateTechnologyVisibility();}).observe(technology);}
-document.addEventListener('visibilitychange',updateTechnologyVisibility);
-updateTechnologyVisibility();
-const reduced=matchMedia('(prefers-reduced-motion: reduce)');
-const cinematic=matchMedia('(min-width: 1100px) and (min-height: 760px) and (prefers-reduced-motion: no-preference)');
-const menuButton=document.querySelector('.menu-toggle'),menu=document.querySelector('#mobile-menu');
-menuButton.hidden=false;
-function closeMenu(restore=false){menu.hidden=true;menuButton.setAttribute('aria-expanded','false');if(restore)menuButton.focus();}
-menuButton.addEventListener('click',()=>{const open=menuButton.getAttribute('aria-expanded')==='true';menu.hidden=open;menuButton.setAttribute('aria-expanded',String(!open));});
-menu.addEventListener('click',event=>{if(event.target.closest('a'))closeMenu();});
-document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!menu.hidden)closeMenu(true);});
-document.addEventListener('click',event=>{if(!menu.hidden&&!menu.contains(event.target)&&!menuButton.contains(event.target))closeMenu();});
-matchMedia('(min-width:768px)').addEventListener('change',()=>closeMenu());
-document.querySelector('#year').textContent=new Date().getFullYear();
-const stories={"erp":{"label":"01 / LOGIOLOGY · COMPANY WORK","title":"Connected records. Clear contribution.","html":"<p>Work across Nebu, Ouro, E-Smith and Profit24 using C#, .NET, .NET Framework, WPF, WCF and SQL Server.</p><h3>What I worked on</h3><ul><li>Sales, purchase, customer savings plans, calculations and reports.</li><li>Changed 14 master-data paths to load when opened.</li><li>Worked across connected business rules and records.</li></ul><h3>What the evidence means</h3><p>The 14-path change describes a loading strategy. No measured startup-speed improvement is claimed. The workflow drawing illustrates relationships; it is not a screenshot of a company product.</p><h3>Source access</h3><p>Company source is private. Public implementation details are limited to the contribution described here.</p>"},"gcc":{"label":"02 / GCC DATA ONBOARDING","title":"Ownership, with a precise boundary.","html":"<p>Logiology’s first GCC client: 13 branches and one head office. More than 130,000 records were involved at one point during the work.</p><h3>My responsibility</h3><p>I owned the onboarding application, its deadlines and the outcome. The wider customer delivery was a team effort.</p><ul><li>Mapped unfamiliar source structures.</li><li>Handled sales, purchase, schemes, inventory and accounting records.</li><li>Worked through failures, retries, reconciliation and verification.</li><li>Supported onboarding while the business continued operating.</li></ul><h3>Scope</h3><p>This was business-data onboarding. The scale is a historical snapshot, not a current usage count. Company source and customer records are private.</p>"},"pursuit":{"label":"03 / PERSONAL PRODUCT · PRIVATE SOURCE","title":"Pursuit: the complete hiring journey.","html":"<p>An actively developed hiring product with role-aware job management, job search, résumé applications, application history, employer review, status changes and administrator controls.</p><h3>Verified snapshot — 8 October 2026</h3><ul><li>Backend build and integration tests passed.</li><li>Frontend lint, 83 tests and production build passed.</li><li>The employer-to-job-seeker browser journey passed in Chromium, Firefox and WebKit.</li></ul><p>Evidence reference: committed revision 29415e2; CI run 37641412173. These are dated checks, not a claim of current deployment or production usage.</p><h3>Engineering boundaries</h3><p>Tenant-aware backend behavior is part of the committed scope. Transactional outbox, deployment migrations, dependency readiness, resource limits and query growth remain engineering work.</p><h3>Private repository</h3><p>The source is private, so there is no public repository or live-demo link. Local experiments are not presented as shipped features.</p>"},"ai":{"label":"04 / RESEARCH EXPERIENCE","title":"Working through the model lifecycle.","html":"<h3>College project</h3><p>Abusive-language detection: convert speech to text, classify with an SVM, and work through training, testing and evaluation.</p><h3>Healthcare R&D — Heveahill</h3><p>Trainee work included healthcare data preparation, model research and selection, training and evaluation, and research into appointment-conversation flows. Retell AI and Hugging Face were among the explored tools.</p><h3>Scope</h3><p>No accuracy figure, dataset size, production deployment or patient outcome is claimed. No customer or patient data is shown.</p>"}};
-const dialog=document.querySelector('#case-dialog');let opener;
-document.querySelectorAll('[data-case]').forEach(button=>button.addEventListener('click',()=>{const story=stories[button.dataset.case];if(!story)return;opener=button;document.querySelector('#case-label').textContent=story.label;document.querySelector('#case-title').textContent=story.title;document.querySelector('#case-content').innerHTML=story.html;dialog.showModal();dialog.scrollTop=0;document.body.classList.add('modal-open');dialog.querySelector('.dialog-close').focus();}));
-dialog.querySelector('.dialog-close').addEventListener('click',()=>dialog.close());
-dialog.addEventListener('click',event=>{const r=dialog.getBoundingClientRect();if(event.target===dialog&&(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom))dialog.close();});
-dialog.addEventListener('close',()=>{document.body.classList.remove('modal-open');opener?.focus({preventScroll:true});});
-const portrait=document.querySelector('.portrait-story'),approach=document.querySelector('.approach'),hero=document.querySelector('.hero'),atmosphere=document.querySelector('.hero-atmosphere');
-let frame=0;const active=new Set();const clamp=value=>Math.min(1,Math.max(0,value));
-function update(){frame=0;if(document.hidden||!cinematic.matches)return;if(active.has(portrait)){const rect=portrait.getBoundingClientRect(),travel=Math.max(1,portrait.offsetHeight-innerHeight),progress=clamp((-rect.top/travel-.08)/.75);portrait.style.setProperty('--portrait-progress',progress.toFixed(4));}if(active.has(approach)){const rect=approach.getBoundingClientRect(),progress=clamp((innerHeight-rect.top)/(innerHeight+rect.height));approach.style.setProperty('--ribbon-shift',((1-progress)*80).toFixed(2)+'px');}}
-function schedule(){if(!frame&&cinematic.matches&&!document.hidden)frame=requestAnimationFrame(update);}
-function configure(){document.documentElement.classList.toggle('motion',cinematic.matches);if(!cinematic.matches){portrait.style.removeProperty('--portrait-progress');approach.style.removeProperty('--ribbon-shift');}else{active.add(portrait);active.add(approach);schedule();}}
-if('IntersectionObserver' in window){const observer=new IntersectionObserver(entries=>{for(const entry of entries){entry.isIntersecting?active.add(entry.target):active.delete(entry.target);if(entry.target===hero)atmosphere.style.animationPlayState=entry.isIntersecting&&!document.hidden?'running':'paused';}schedule();},{rootMargin:'100px'});[portrait,approach,hero].forEach(el=>observer.observe(el));}
-window.addEventListener('scroll',schedule,{passive:true});window.addEventListener('resize',schedule,{passive:true});cinematic.addEventListener('change',configure);reduced.addEventListener('change',configure);document.addEventListener('visibilitychange',()=>{atmosphere.style.animationPlayState=!document.hidden&&active.has(hero)?'running':'paused';schedule();});configure();
-// Resolve anchor positions from normal flow, including cards already in a sticky stack.
-function goToSection(hash,behavior='smooth'){
- const target=document.getElementById(hash.slice(1));if(!target)return;
- document.documentElement.classList.add('measuring');
- const top=target.getBoundingClientRect().top+scrollY-24;
- document.documentElement.classList.remove('measuring');
- window.scrollTo({top,behavior:reduced.matches?'instant':behavior});
+const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+const mobile = matchMedia('(max-width: 767px)');
+const menuButton = document.querySelector('.menu-button');
+const menu = document.querySelector('.mobile-nav');
+menuButton.hidden = false;
+function closeMenu(restore = false) {
+  menu.hidden = true;
+  menuButton.setAttribute('aria-expanded', 'false');
+  menuButton.innerHTML = 'Menu <span>＋</span>';
+  if (restore) menuButton.focus();
 }
-document.querySelectorAll('a[href^="#"]').forEach(link=>link.addEventListener('click',event=>{
- if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
- event.preventDefault();const hash=link.getAttribute('href');
- if(location.hash!==hash)history.pushState(null,'',hash);
- goToSection(hash);
- const target=document.getElementById(hash.slice(1));
- if(target){target.setAttribute('tabindex','-1');target.focus({preventScroll:true});}
-}));
-window.addEventListener('popstate',()=>goToSection(location.hash||'#home','instant'));
-if(location.hash)requestAnimationFrame(()=>goToSection(location.hash,'instant'));
-document.addEventListener('focusin',event=>{
- if(!cinematic.matches||dialog.open)return;
- if(event.target.closest('.about-copy')&&Number(getComputedStyle(document.querySelector('.about-copy')).opacity)<1){
-  window.scrollTo({top:portrait.offsetTop+portrait.offsetHeight-innerHeight,behavior:'instant'});schedule();
- }
- const card=event.target.closest('.project');
- if(card&&event.target.matches('button,a')){
-  const r=event.target.getBoundingClientRect(),front=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);
-  if(front&&!event.target.contains(front))goToSection('#'+card.id,'instant');
- }
+menuButton.addEventListener('click', () => {
+  const open = menu.hidden;
+  menu.hidden = !open;
+  menuButton.setAttribute('aria-expanded', String(open));
+  menuButton.innerHTML = open ? 'Close <span>×</span>' : 'Menu <span>＋</span>';
 });
+menu.addEventListener('click', e => { if (e.target.closest('a')) closeMenu(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (!menu.hidden) closeMenu(true); if (!context.hidden) setContext(false); } });
+document.addEventListener('click', e => { if (!menu.hidden && !e.target.closest('.header')) closeMenu(); });
+mobile.addEventListener('change', () => { closeMenu(); updateCarousel(); });
+
+const context = document.querySelector('.portrait-context');
+const portraitToggle = document.querySelector('.portrait-toggle');
+const captionToggle = document.querySelector('.portrait-caption-toggle');
+portraitToggle.hidden = captionToggle.hidden = false;
+function setContext(open) {
+  context.hidden = !open;
+  portraitToggle.setAttribute('aria-expanded', String(open));
+  portraitToggle.setAttribute('aria-label', open ? 'Close personal context' : 'Read a little context about Adheeb');
+  portraitToggle.textContent = open ? '×' : '＋';
+  captionToggle.innerHTML = open ? 'Back to portrait <span>↗</span>' : 'More about me <span>↗</span>';
+}
+portraitToggle.addEventListener('click', () => setContext(context.hidden));
+captionToggle.addEventListener('click', () => setContext(context.hidden));
+
+const filters = document.querySelector('.filters');
+const projects = [...document.querySelectorAll('.project')];
+const projectGrid = document.querySelector('.project-grid');
+const count = document.querySelector('.project-count');
+const controls = document.querySelector('.carousel-controls');
+const previous = document.querySelector('.previous');
+const next = document.querySelector('.next');
+filters.hidden = false;
+function visibleProjects() { return projects.filter(p => !p.hidden); }
+function updateCarousel() {
+  const visible = visibleProjects();
+  controls.hidden = !mobile.matches || visible.length < 2;
+  projectGrid.classList.toggle('single', visible.length === 1);
+  previous.disabled = projectGrid.scrollLeft <= 2;
+  next.disabled = projectGrid.scrollLeft >= projectGrid.scrollWidth - projectGrid.clientWidth - 3;
+}
+filters.addEventListener('click', event => {
+  const button = event.target.closest('[data-filter]');
+  if (!button) return;
+  const category = button.dataset.filter;
+  filters.querySelectorAll('button').forEach(b => { b.classList.toggle('active', b === button); b.setAttribute('aria-pressed', String(b === button)); });
+  projects.forEach(p => { p.hidden = category !== 'all' && p.dataset.category !== category; });
+  const amount = visibleProjects().length;
+  count.textContent = `${String(amount).padStart(2, '0')} ${amount === 1 ? 'project' : 'projects'}`;
+  projectGrid.hidden = visibleProjects().length === 0;
+  projectGrid.scrollTo({ left: 0, behavior: 'instant' });
+  updateCarousel();
+});
+function moveCarousel(direction) {
+  const visible = visibleProjects();
+  const step = visible[0]?.getBoundingClientRect().width + 18 || projectGrid.clientWidth;
+  projectGrid.scrollBy({ left: direction * step, behavior: reduced.matches ? 'instant' : 'smooth' });
+}
+previous.addEventListener('click', () => moveCarousel(-1));
+next.addEventListener('click', () => moveCarousel(1));
+projectGrid.addEventListener('scroll', updateCarousel, { passive: true });
+addEventListener('resize', updateCarousel, { passive: true });
+updateCarousel();
+document.querySelectorAll('[data-open]').forEach(button => {
+  const details = document.getElementById(button.dataset.open);
+  button.addEventListener('click', () => {
+    details.open = !details.open;
+    if (details.open) details.scrollIntoView({block:'nearest',behavior:reduced.matches?'instant':'smooth'});
+  });
+  details.addEventListener('toggle', () => button.setAttribute('aria-expanded', String(details.open)));
+});
+
+const technology = document.querySelector('.technology');
+const track = document.querySelector('.technology-track');
+const copy = track.firstElementChild.cloneNode(true);
+copy.setAttribute('aria-hidden', 'true');
+track.append(copy);
+const motionButton = document.querySelector('.motion-button');
+motionButton.hidden = false;
+motionButton.addEventListener('click', () => {
+  const paused = technology.classList.toggle('paused');
+  motionButton.setAttribute('aria-pressed', String(paused));
+  motionButton.textContent = paused ? 'Resume motion ▶' : 'Pause motion Ⅱ';
+});
+let technologyVisible = false;
+function syncTechnology() { technology.classList.toggle('in-view', technologyVisible && !document.hidden); }
+new IntersectionObserver(entries => { technologyVisible = entries[0].isIntersecting; syncTechnology(); }, { rootMargin: '60px' }).observe(technology);
+document.addEventListener('visibilitychange', syncTechnology);
+
+let frame = 0;
+const progress = document.querySelector('.read-progress');
+const sections = [...document.querySelectorAll('main>section[id]')];
+const navLinks = [...document.querySelectorAll('.desktop-nav a')];
+function updateReading() {
+  frame = 0;
+  const max = document.documentElement.scrollHeight - innerHeight;
+  progress.style.transform = `scaleX(${max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0})`;
+  let active = 'home';
+  for (const section of sections) if (section.getBoundingClientRect().top < innerHeight * .4) active = section.id;
+  navLinks.forEach(link => { const selected = link.hash === '#' + active; link.classList.toggle('active', selected); if (selected) link.setAttribute('aria-current','location'); else link.removeAttribute('aria-current'); });
+}
+addEventListener('scroll', () => { if (!frame) frame = requestAnimationFrame(updateReading); }, { passive: true });
+updateReading();
+
+const email = 'adheebabdullavp@gmail.com';
+const copyEmail = document.querySelector('.copy-email');
+copyEmail.hidden = false;
+copyEmail.addEventListener('click', async () => {
+  const status = document.querySelector('.copy-status');
+  try { await navigator.clipboard.writeText(email); status.textContent = 'Email address copied.'; }
+  catch { status.textContent = 'Select the email address above to copy it, or click it to open your email app.'; }
+});
+document.querySelector('.contact-form').addEventListener('submit', event => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  if (!form.reportValidity()) return;
+  const name = form.elements.name.value.trim();
+  const from = form.elements.email.value.trim();
+  const message = form.elements.message.value.trim();
+  if (!name || !message) { document.querySelector('.form-status').textContent = 'Please enter your name and message.'; return; }
+  const subject = `Portfolio enquiry from ${name}`;
+  const body = `${message}\n\nFrom: ${name}\nReply to: ${from}`;
+  location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  document.querySelector('.form-status').textContent = 'Your email app should open with a draft. If it does not, use the email address shown here.';
+});
+document.querySelector('#year').textContent = new Date().getFullYear();
+
+const trophyStage = document.querySelector('.trophy-stage');
+const trophyToggle = document.querySelector('.trophy-toggle');
+trophyToggle.hidden = false;
+trophyToggle.addEventListener('click', () => {
+  const inspecting = trophyStage.classList.toggle('inspecting');
+  trophyToggle.setAttribute('aria-pressed', String(inspecting));
+  trophyToggle.textContent = inspecting ? 'Return to full view' : 'Take a closer look';
+});
+let trophyFrame = 0;
+function resetTrophy() {
+  cancelAnimationFrame(trophyFrame);
+  trophyStage.style.setProperty('--tilt-x', '0deg');
+  trophyStage.style.setProperty('--tilt-y', '0deg');
+}
+trophyStage.addEventListener('pointermove', event => {
+  if (reduced.matches || event.pointerType !== 'mouse') return;
+  const rect = trophyStage.getBoundingClientRect();
+  const x = Math.max(-1, Math.min(1, (event.clientX - rect.left) / rect.width * 2 - 1));
+  const y = Math.max(-1, Math.min(1, (event.clientY - rect.top) / rect.height * 2 - 1));
+  cancelAnimationFrame(trophyFrame);
+  trophyFrame = requestAnimationFrame(() => {
+    trophyStage.style.setProperty('--tilt-x', `${-y * 5}deg`);
+    trophyStage.style.setProperty('--tilt-y', `${x * 7}deg`);
+  });
+});
+trophyStage.addEventListener('pointerleave', resetTrophy);
+trophyStage.addEventListener('pointercancel', resetTrophy);
+reduced.addEventListener('change', resetTrophy);
+
+// One gentle entrance per section; never hide content or intercept scrolling.
+if ('IntersectionObserver' in window) {
+  const entrances = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      if (!reduced.matches) {
+        entry.target.classList.add('chapter-arrival');
+        const heading = entry.target.querySelector('.section-heading, .about-intro, .experience-grid, .contact-grid') || entry.target;
+        heading.classList.add('section-arrival');
+        heading.addEventListener('animationend', () => heading.classList.remove('section-arrival'), { once: true });
+      }
+      entrances.unobserve(entry.target);
+    }
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0 });
+  document.querySelectorAll('main > section:not(.hero), .recognition').forEach(section => entrances.observe(section));
+}
