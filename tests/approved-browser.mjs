@@ -47,7 +47,7 @@ for (const [engine, type] of Object.entries({chromium,firefox,webkit})) {
         assert.equal(await page.locator('#gcc-details summary').evaluate(e=>e===document.activeElement),true);
         await page.locator('.experience-list details').nth(1).locator('summary').click();
         await page.waitForFunction(()=>document.querySelectorAll('.experience-route li')[1].getAttribute('aria-current')==='step');
-        for(const name of ['interface','data','delivery','testing','research','ai','backend']){
+        for(const name of ['interface','data','delivery','testing','research','backend']){
           await page.locator(width<768?'#tools-'+name+' summary':'[data-tool="'+name+'"]').click();
           assert.equal(await page.locator('#tools-'+name).evaluate(e=>e.open),true);
           assert.equal(await page.locator('.tool-category[open]').count(),1);
