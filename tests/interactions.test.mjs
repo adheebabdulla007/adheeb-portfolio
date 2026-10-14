@@ -7,7 +7,7 @@ test('interface icons cannot fall back to platform emoji glyphs', () => {
   assert.equal(/[↗↘↓↑←→＋×▦⇄⌘◉Ⅱ▶\uFE0F]/u.test(html + js), false);
 });
 test('tool categories expose readable native disclosure content', () => {
-  for (const name of ['backend','interface','data','delivery','testing','research']) {
+  for (const name of ['backend','interface','data','delivery','testing','research','ai']) {
     assert.match(html, new RegExp('<details[^>]*id="tools-' + name + '"'));
   }
   assert.equal(/class="(?:technology|stack-anchor)/.test(html), false);

@@ -47,11 +47,12 @@ for (const [engine, type] of Object.entries({chromium,firefox,webkit})) {
         assert.equal(await page.locator('#gcc-details summary').evaluate(e=>e===document.activeElement),true);
         await page.locator('.experience-list details').nth(1).locator('summary').click();
         await page.waitForFunction(()=>document.querySelectorAll('.experience-route li')[1].getAttribute('aria-current')==='step');
-        for(const name of ['interface','data','delivery','testing','research','backend']){
+        for(const name of ['interface','data','delivery','testing','research','ai','backend']){
           await page.locator(width<768?'#tools-'+name+' summary':'[data-tool="'+name+'"]').click();
           assert.equal(await page.locator('#tools-'+name).evaluate(e=>e.open),true);
           assert.equal(await page.locator('.tool-category[open]').count(),1);
           assert.ok(await page.locator('#tools-'+name+' .tool-panel').isVisible());
+          await page.locator('#tools-'+name+' img').evaluateAll(images=>Promise.all(images.map(img=>img.decode())));
         }
         assert.equal(/[↗↘↓↑←→＋×▦⇄⌘◉Ⅱ▶\uFE0F]/u.test(await page.locator('body').innerText()),false);
         assert.ok(await page.locator('.header-email svg').count());
