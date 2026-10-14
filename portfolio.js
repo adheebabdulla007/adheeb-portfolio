@@ -98,6 +98,11 @@ function selectTool(id) {
   toolButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.tool === id)));
 }
 toolButtons.forEach(button => button.addEventListener('click', () => selectTool(button.dataset.tool)));
+toolCategories.forEach(item => item.querySelector('summary').addEventListener('click', event => {
+  event.preventDefault();
+  if (item.open) item.open = false;
+  else selectTool(item.id.slice(6));
+}));
 toolCategories.forEach(item => item.addEventListener('toggle', () => {
   if (item.open && selectedTool !== item.id.slice(6)) selectTool(item.id.slice(6));
 }));
