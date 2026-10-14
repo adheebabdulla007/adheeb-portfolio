@@ -1,4 +1,44 @@
 /* Approved refinements: shared project rhythm, market context and recognition. */
+/* Purposeful interactions with native disclosure fallbacks. */
+.ui-icon{display:inline-block;width:1.1em;height:1.1em;vertical-align:-.16em;flex-shrink:0}
+.capability-symbol .ui-icon{width:32px;height:32px}
+.portrait-toggle .ui-icon{width:24px;height:24px}
+.capability-link{font-size:12px;margin-top:22px;min-height:44px}
+.close-project{margin-top:22px;color:inherit;min-height:44px;font-size:12px;gap:12px}
+.tool-index{display:grid;grid-template-columns:minmax(200px,.7fr) minmax(0,1.3fr);gap:clamp(28px,6vw,90px);align-items:start}
+.tool-nav{position:sticky;top:110px}
+.tool-nav button{display:flex;align-items:center;gap:20px;width:100%;padding:22px 18px;border-bottom:1px solid var(--line);text-align:left;font-family:var(--display);font-size:clamp(19px,2vw,27px);color:var(--muted);transition:background .2s,color .2s}
+.tool-nav button .ui-icon{margin-left:auto;width:20px;height:20px;transition:transform .25s}
+.tool-nav button[aria-pressed=true]{background:#d4d9d6;color:var(--ink);box-shadow:inset 3px 0 var(--accent)}
+.tool-nav button[aria-pressed=true] .ui-icon{transform:translateX(4px)}
+.tool-nav button:hover{background:#dedfd9;color:var(--ink)}
+.tool-number{font-size:11px;letter-spacing:.05em;color:var(--muted)}
+.tool-panels{min-width:0;min-height:480px}
+.tool-category{border-bottom:1px solid var(--line)}
+.tool-category summary{display:flex;align-items:center;gap:18px;min-height:72px;font-family:var(--display);font-size:23px;list-style:none;cursor:pointer}
+.tool-category summary::-webkit-details-marker{display:none}
+.tool-category summary .plus{margin-left:auto}
+.tool-panel{padding:26px 0 10px}
+.tool-panel>.eyebrow{color:var(--accent)}
+.tool-panel>h3{font-size:clamp(25px,2.8vw,38px);letter-spacing:-.04em;line-height:1.2;margin:16px 0 28px}
+.tool-items{list-style:none;margin:0;padding:0}
+.tool-items li{display:flex;align-items:flex-start;gap:20px;border-top:1px solid var(--line);padding:20px 0}
+.tool-logo{display:grid;place-items:center;width:56px;height:56px;flex:none;background:#f7f7f3;border:1px solid #171b1d17;border-radius:8px}
+.tool-logo img{width:36px;height:36px;object-fit:contain}
+.tool-research{color:#34464d}
+.tool-research .ui-icon{width:28px;height:28px}
+.tool-items h4{font-size:18px;margin:2px 0 6px;line-height:1.35}
+.tool-items p{font-size:13px;line-height:1.8;color:var(--muted);max-width:440px}
+.experience-route li>span{transition:background .25s,color .25s,border-color .25s}
+.experience-route li.current>span{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.experience-route li.current strong{color:var(--accent)}
+.desktop-nav{position:relative}
+.nav-indicator{position:absolute;left:0;bottom:-6px;height:2px;background:var(--accent);pointer-events:none;transition:transform .35s ease,width .35s ease,opacity .2s}
+.js .desktop-nav a:after{display:none}
+@media(min-width:768px){.js .tool-category{border:0}.js .tool-category>summary{display:none}.js .tool-panel{padding-top:0}html:not(.js) .tool-index{display:block}}
+@media(max-width:767px){.tool-index{display:block}.tool-nav{display:none}.tool-panels{min-height:0}.tool-panel{padding:12px 0 26px}.tool-items li{gap:16px}.tool-items p{font-size:12px}.experience-route li.current>span{display:inline-block;padding:4px 7px}.tool-category[open]>summary{color:var(--accent)}}
+@media(prefers-reduced-motion:no-preference){.tool-category[open] .tool-panel,.project details[open] .detail-content{animation:tool-reveal .3s ease-out both}@keyframes tool-reveal{from{opacity:.35;transform:translateY(8px)}to{opacity:1;transform:none}}}
+@media(prefers-reduced-motion:reduce){.tool-nav button,.tool-nav button .ui-icon,.nav-indicator,.experience-route li>span{transition:none}}
 /* Industrial direction: restrained colour, solid surfaces and heavier type. */
 .capabilities .capability-top .eyebrow{color:#733515}
 /* Numbered project titles already identify each item without faint watermarks. */

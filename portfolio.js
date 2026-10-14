@@ -1,4 +1,8 @@
 document.documentElement.classList.add('js');
+const iconPaths = {"out":"M5 19 19 5M5 5h14v14","plus":"M12 5v14M5 12h14","close":"m6 6 12 12M6 18 18 6"};
+function uiIcon(name) {
+  return `<svg class="ui-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="${iconPaths[name]}"/></svg>`;
+}
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 const mobile = matchMedia('(max-width: 767px)');
 const menuButton = document.querySelector('.menu-button');
@@ -7,14 +11,14 @@ menuButton.hidden = false;
 function closeMenu(restore = false) {
   menu.hidden = true;
   menuButton.setAttribute('aria-expanded', 'false');
-  menuButton.innerHTML = 'Menu <span>＋</span>';
+  menuButton.innerHTML = 'Menu ' + uiIcon('plus');
   if (restore) menuButton.focus();
 }
 menuButton.addEventListener('click', () => {
   const open = menu.hidden;
   menu.hidden = !open;
   menuButton.setAttribute('aria-expanded', String(open));
-  menuButton.innerHTML = open ? 'Close <span>×</span>' : 'Menu <span>＋</span>';
+  menuButton.innerHTML = open ? 'Close ' + uiIcon('close') : 'Menu ' + uiIcon('plus');
 });
 menu.addEventListener('click', e => { if (e.target.closest('a')) closeMenu(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (!menu.hidden) closeMenu(true); if (!context.hidden) setContext(false); } });
@@ -29,8 +33,8 @@ function setContext(open) {
   context.hidden = !open;
   portraitToggle.setAttribute('aria-expanded', String(open));
   portraitToggle.setAttribute('aria-label', open ? 'Close personal context' : 'Read a little context about Adheeb');
-  portraitToggle.textContent = open ? '×' : '＋';
-  captionToggle.innerHTML = open ? 'Back to portrait <span>↗</span>' : 'More about me <span>↗</span>';
+  portraitToggle.innerHTML = uiIcon(open ? 'close' : 'plus');
+  captionToggle.innerHTML = (open ? 'Back to portrait ' : 'More about me ') + uiIcon('out');
 }
 portraitToggle.addEventListener('click', () => setContext(context.hidden));
 captionToggle.addEventListener('click', () => setContext(context.hidden));
@@ -82,27 +86,72 @@ document.querySelectorAll('[data-open]').forEach(button => {
   details.addEventListener('toggle', () => button.setAttribute('aria-expanded', String(details.open)));
 });
 
-const technology = document.querySelector('.technology');
-const track = document.querySelector('.technology-track');
-const copy = track.firstElementChild.cloneNode(true);
-copy.setAttribute('aria-hidden', 'true');
-track.append(copy);
-const motionButton = document.querySelector('.motion-button');
-motionButton.hidden = false;
-motionButton.addEventListener('click', () => {
-  const paused = technology.classList.toggle('paused');
-  motionButton.setAttribute('aria-pressed', String(paused));
-  motionButton.textContent = paused ? 'Resume motion ▶' : 'Pause motion Ⅱ';
+// Native disclosures remain usable without JavaScript and on small screens.
+const toolNav = document.querySelector('.tool-nav');
+const toolButtons = [...toolNav.querySelectorAll('[data-tool]')];
+const toolCategories = [...document.querySelectorAll('.tool-category')];
+toolNav.hidden = false;
+let selectedTool = 'backend';
+function selectTool(id) {
+  selectedTool = id;
+  toolCategories.forEach(item => { item.open = item.id === 'tools-' + id; });
+  toolButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.tool === id)));
+}
+toolButtons.forEach(button => button.addEventListener('click', () => selectTool(button.dataset.tool)));
+toolCategories.forEach(item => item.addEventListener('toggle', () => {
+  if (item.open && selectedTool !== item.id.slice(6)) selectTool(item.id.slice(6));
+}));
+mobile.addEventListener('change', () => selectTool(selectedTool));
+
+document.querySelectorAll('[data-close-project]').forEach(button => {
+  button.hidden = false;
+  button.addEventListener('click', () => {
+    const details = document.getElementById(button.dataset.closeProject);
+    details.open = false;
+    details.querySelector('summary').focus({preventScroll:true});
+    details.scrollIntoView({block:'nearest',behavior:reduced.matches?'instant':'smooth'});
+  });
 });
-let technologyVisible = false;
-function syncTechnology() { technology.classList.toggle('in-view', technologyVisible && !document.hidden); }
-new IntersectionObserver(entries => { technologyVisible = entries[0].isIntersecting; syncTechnology(); }, { rootMargin: '60px' }).observe(technology);
-document.addEventListener('visibilitychange', syncTechnology);
+document.querySelectorAll('[data-project-link]').forEach(link => link.addEventListener('click', event => {
+  event.preventDefault();
+  filters.querySelector('[data-filter="all"]').click();
+  const project = document.getElementById(link.dataset.projectLink);
+  const details = project.querySelector('details');
+  details.open = true;
+  history.replaceState(null, '', link.hash);
+  details.querySelector('summary').focus({preventScroll:true});
+  if (mobile.matches) {
+    const left = projectGrid.scrollLeft + project.getBoundingClientRect().left - projectGrid.getBoundingClientRect().left;
+    projectGrid.scrollTo({left,behavior:'instant'});
+  }
+  window.scrollTo({top:scrollY + project.getBoundingClientRect().top - 100,behavior:reduced.matches?'instant':'smooth'});
+}));
+const experienceEntries = [...document.querySelectorAll('.experience-list details')];
+const routeItems = [...document.querySelectorAll('.experience-route li')];
+function selectExperience(entry) {
+  experienceEntries.forEach(item => { if (item !== entry) item.open = false; });
+  routeItems.forEach((item,index) => {
+    const active = index === 2 - experienceEntries.indexOf(entry);
+    item.classList.toggle('current',active);
+    if(active) item.setAttribute('aria-current','step'); else item.removeAttribute('aria-current');
+  });
+}
+experienceEntries.forEach(entry => entry.addEventListener('toggle', () => {
+  if (entry.open) selectExperience(entry);
+  else if (!experienceEntries.some(item => item.open)) routeItems.forEach(item => {
+    item.classList.remove('current'); item.removeAttribute('aria-current');
+  });
+}));
+selectExperience(experienceEntries[0]);
 
 let frame = 0;
 const progress = document.querySelector('.read-progress');
 const sections = [...document.querySelectorAll('main>section[id]')];
 const navLinks = [...document.querySelectorAll('.desktop-nav a')];
+const navIndicator = document.createElement('span');
+navIndicator.className = 'nav-indicator';
+navIndicator.setAttribute('aria-hidden','true');
+document.querySelector('.desktop-nav').append(navIndicator);
 function updateReading() {
   frame = 0;
   const max = document.documentElement.scrollHeight - innerHeight;
@@ -110,7 +159,14 @@ function updateReading() {
   let active = 'home';
   for (const section of sections) if (section.getBoundingClientRect().top < innerHeight * .4) active = section.id;
   navLinks.forEach(link => { const selected = link.hash === '#' + active; link.classList.toggle('active', selected); if (selected) link.setAttribute('aria-current','location'); else link.removeAttribute('aria-current'); });
+  const current = navLinks.find(link => link.classList.contains('active'));
+  navIndicator.style.opacity = current ? '1' : '0';
+  if(current) {
+    navIndicator.style.width = current.offsetWidth + 'px';
+    navIndicator.style.transform = `translateX(${current.offsetLeft}px)`;
+  }
 }
+addEventListener('resize', updateReading, {passive:true});
 addEventListener('scroll', () => { if (!frame) frame = requestAnimationFrame(updateReading); }, { passive: true });
 updateReading();
 

@@ -40,6 +40,21 @@ for (const [engine, type] of Object.entries({chromium,firefox,webkit})) {
         assert.equal(await page.locator('.trophy-toggle').getAttribute('aria-pressed'),'true');
         await page.locator('.trophy-toggle').press('Enter');
         assert.equal(await page.locator('.trophy-toggle').getAttribute('aria-pressed'),'false');
+        await page.locator('[data-project-link="gcc"]').click();
+        assert.equal(await page.locator('#gcc-details').evaluate(e=>e.open),true);
+        await page.locator('[data-close-project="gcc-details"]').click();
+        assert.equal(await page.locator('#gcc-details').evaluate(e=>e.open),false);
+        assert.equal(await page.locator('#gcc-details summary').evaluate(e=>e===document.activeElement),true);
+        await page.locator('.experience-list details').nth(1).locator('summary').click();
+        await page.waitForFunction(()=>document.querySelectorAll('.experience-route li')[1].getAttribute('aria-current')==='step');
+        for(const name of ['interface','data','delivery','testing','research','backend']){
+          await page.locator(width<768?'#tools-'+name+' summary':'[data-tool="'+name+'"]').click();
+          assert.equal(await page.locator('#tools-'+name).evaluate(e=>e.open),true);
+          assert.equal(await page.locator('.tool-category[open]').count(),1);
+          assert.ok(await page.locator('#tools-'+name+' .tool-panel').isVisible());
+        }
+        assert.equal(/[↗↘↓↑←→＋×▦⇄⌘◉Ⅱ▶\uFE0F]/u.test(await page.locator('body').innerText()),false);
+        assert.ok(await page.locator('.header-email svg').count());
         for(const id of ['about','experience','toolkit','contact']){
           await page.locator('#'+id).scrollIntoViewIfNeeded();
           assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'overflow '+id);
@@ -65,17 +80,16 @@ for (const [engine, type] of Object.entries({chromium,firefox,webkit})) {
       try{
         await page.goto(base);
         if(mode==='motion'){
-          await page.locator('.motion-button').scrollIntoViewIfNeeded();
-          await page.waitForFunction(()=>document.querySelector('.technology').classList.contains('in-view'));
-          await page.locator('.motion-button').click();
-          assert.equal(await page.locator('.motion-button').getAttribute('aria-pressed'),'true');
-          assert.equal(await page.locator('.technology-track').evaluate(e=>getComputedStyle(e).animationPlayState),'paused');
-          await page.locator('.motion-button').click();
-          assert.equal(await page.locator('.motion-button').getAttribute('aria-pressed'),'false');
+          await page.locator('#tools-testing summary').click();
+          assert.ok(await page.locator('#tools-testing .tool-panel').isVisible());
+          await page.locator('#tools-testing summary').press('Enter');
+          assert.equal(await page.locator('#tools-testing').evaluate(e=>e.open),false);
         }else{
           await page.locator('#erp-details summary').click();
           assert.equal(await page.locator('#erp-details').evaluate(e=>e.open),true);
           assert.ok(await page.locator('.about-story').isVisible());
+          await page.locator('#tools-data summary').click();
+          assert.ok(await page.locator('#tools-data .tool-panel').isVisible());
         }
         results.push({engine,mode,pass:true});
       }catch(error){results.push({engine,mode,error:error.message});}
