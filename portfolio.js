@@ -183,18 +183,37 @@ copyEmail.addEventListener('click', async () => {
   try { await navigator.clipboard.writeText(email); status.textContent = 'Email address copied.'; }
   catch { status.textContent = 'Select the email address above to copy it, or click it to open your email app.'; }
 });
-document.querySelector('.contact-form').addEventListener('submit', event => {
+const contactForm = document.querySelector('.contact-form');
+const draftPanel = document.querySelector('.email-draft');
+const formStatus = document.querySelector('.form-status');
+contactForm.addEventListener('input', () => {
+  draftPanel.hidden = true;
+  formStatus.textContent = '';
+});
+contactForm.addEventListener('submit', event => {
   event.preventDefault();
-  const form = event.currentTarget;
-  if (!form.reportValidity()) return;
-  const name = form.elements.name.value.trim();
-  const from = form.elements.email.value.trim();
-  const message = form.elements.message.value.trim();
-  if (!name || !message) { document.querySelector('.form-status').textContent = 'Please enter your name and message.'; return; }
+  if (!contactForm.reportValidity()) return;
+  const name = contactForm.elements.name.value.trim();
+  const from = contactForm.elements.email.value.trim();
+  const message = contactForm.elements.message.value.trim();
+  if (!name || !message) { formStatus.textContent = 'Please enter your name and message.'; return; }
   const subject = `Portfolio enquiry from ${name}`;
   const body = `${message}\n\nFrom: ${name}\nReply to: ${from}`;
-  location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  document.querySelector('.form-status').textContent = 'Your email app should open with a draft. If it does not, use the email address shown here.';
+  document.querySelector('.draft-subject').textContent = `Subject: ${subject}`;
+  document.querySelector('.draft-mailto').href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const gmail = new URL('https://mail.google.com/mail/');
+  gmail.search = new URLSearchParams({view:'cm',fs:'1',to:email,su:subject,body}).toString();
+  document.querySelector('.draft-gmail').href = gmail.href;
+  document.querySelector('#draft-preview').value = `To: ${email}\nSubject: ${subject}\n\n${body}`;
+  draftPanel.hidden = false;
+  formStatus.textContent = 'Email prepared. Choose how to open it, then press Send in your email service.';
+  document.querySelector('.draft-gmail').focus({preventScroll:true});
+  draftPanel.scrollIntoView({block:'nearest',behavior:reduced.matches?'instant':'smooth'});
+});
+document.querySelector('.copy-draft').addEventListener('click', async () => {
+  const preview = document.querySelector('#draft-preview');
+  try { await navigator.clipboard.writeText(preview.value); formStatus.textContent = 'Email copied. Paste it into your email service and send it to the address shown.'; }
+  catch { preview.focus(); preview.select(); formStatus.textContent = 'Copy the selected email, then paste it into your email service.'; }
 });
 document.querySelector('#year').textContent = new Date().getFullYear();
 

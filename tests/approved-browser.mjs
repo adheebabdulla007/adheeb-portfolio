@@ -8,7 +8,7 @@ await mkdir(new URL('../qa/',import.meta.url),{recursive:true});
 for (const [engine, type] of Object.entries({chromium,firefox,webkit})) {
   const browser = await type.launch();
   try {
-    for (const width of [320,390,768,1440,1920]) {
+    for (const width of [320,360,375,390,414,600,767,768,820,1024,1280,1440,1920,2560]) {
       const context = await browser.newContext({viewport:{width,height:900},reducedMotion:'reduce'});
       const page = await context.newPage();
       const errors=[],bad=[];
@@ -40,8 +40,13 @@ for (const [engine, type] of Object.entries({chromium,firefox,webkit})) {
         assert.equal(await page.locator('.trophy-toggle').getAttribute('aria-pressed'),'true');
         await page.locator('.trophy-toggle').press('Enter');
         assert.equal(await page.locator('.trophy-toggle').getAttribute('aria-pressed'),'false');
-        await page.locator('[data-project-link="gcc"]').click();
+        await page.locator('.capability-shortcuts [data-project-link="gcc"]').click();
         assert.equal(await page.locator('#gcc-details').evaluate(e=>e.open),true);
+        const actions=await page.locator('#gcc .project-actions').evaluate(e=>[...e.children].map(c=>{const r=c.getBoundingClientRect();return {x:r.x,y:r.y,right:r.right,bottom:r.bottom,height:r.height}}));
+        assert.ok(actions[0].right<=actions[1].x-8 || actions[0].bottom<=actions[1].y-8,'GCC actions overlap or lack spacing');
+        assert.ok(actions.every(r=>r.height>=44),'GCC action touch targets');
+        assert.equal(await page.locator('main > #gcc-case-study').count(),1);
+        assert.equal(await page.locator('.professional-toolkit').count(),0);
         await page.locator('[data-close-project="gcc-details"]').click();
         assert.equal(await page.locator('#gcc-details').evaluate(e=>e.open),false);
         assert.equal(await page.locator('#gcc-details summary').evaluate(e=>e===document.activeElement),true);
@@ -56,11 +61,11 @@ for (const [engine, type] of Object.entries({chromium,firefox,webkit})) {
         }
         assert.equal(/[↗↘↓↑←→＋×▦⇄⌘◉Ⅱ▶\uFE0F]/u.test(await page.locator('body').innerText()),false);
         assert.ok(await page.locator('.header-email svg').count());
-        for(const id of ['about','experience','toolkit','contact']){
+        for(const id of ['gcc-case-study','about','experience','toolkit','contact']){
           await page.locator('#'+id).scrollIntoViewIfNeeded();
           assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'overflow '+id);
         }
-        await page.locator('.contact-form button').click();
+        await page.locator('.contact-form button[type=submit]').click();
         assert.equal(await page.locator('.contact-form').evaluate(f=>f.checkValidity()),false);
         await page.addScriptTag({content:axe});
         const audit=await page.evaluate(()=>axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}}));
