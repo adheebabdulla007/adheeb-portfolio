@@ -1,7 +1,7 @@
 import {chromium, firefox, webkit} from 'playwright';
 import assert from 'node:assert/strict';
 
-const base = process.env.QA_URL || 'http://127.0.0.1:8782/';
+const base = process.env.QA_URL || 'http://127.0.0.1:8777/';
 for (const [engine, type] of Object.entries({chromium, firefox, webkit})) {
   const browser = await type.launch();
   try {
