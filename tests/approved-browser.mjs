@@ -46,6 +46,17 @@ for (const [engine, type] of Object.entries({chromium,firefox,webkit})) {
         assert.ok(actions[0].right<=actions[1].x-8 || actions[0].bottom<=actions[1].y-8,'GCC actions overlap or lack spacing');
         assert.ok(actions.every(r=>r.height>=44),'GCC action touch targets');
         assert.equal(await page.locator('main > #gcc-case-study').count(),1);
+        assert.equal(await page.locator('#projects .section-bottom a').getAttribute('href'),'#gcc-case-study');
+        assert.ok(!(await page.locator('.portrait-context').textContent()).includes('Pursuit'));
+        const engineering=page.locator('.case-engineering');
+        assert.equal(await engineering.evaluate(e=>e.open),false);
+        await engineering.locator('summary').press('Enter');
+        assert.equal(await engineering.evaluate(e=>e.open),true);
+        assert.ok(await page.locator('.case-validation').isVisible());
+        assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'expanded case overflow');
+        await engineering.locator('summary').press('Enter');
+        assert.equal(await engineering.evaluate(e=>e.open),false);
+
         assert.equal(await page.locator('.professional-toolkit').count(),0);
         await page.locator('[data-close-project="gcc-details"]').click();
         assert.equal(await page.locator('#gcc-details').evaluate(e=>e.open),false);

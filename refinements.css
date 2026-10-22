@@ -234,3 +234,23 @@ h1,h2,h3,h4{font-weight:600}
 .draft-actions .line-link{min-height:44px;margin:0;font-size:13px}
 .email-draft textarea{width:100%;font-size:13px;line-height:1.7;resize:vertical}
 @media(max-width:767px){.email-draft{padding:16px}.draft-actions{align-items:flex-start;flex-direction:column}}
+
+/* Scannable case-study overview; full engineering evidence remains available. */
+.case-flow{margin-top:28px}
+.case-flow ol{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));list-style:none;padding:0;margin:16px 0 0;gap:0}
+.case-flow li{position:relative;min-width:0;padding:16px;border-top:2px solid #627c73;border-left:1px solid #a8b8b2}
+.case-flow li:last-child{border-right:1px solid #a8b8b2}
+.case-step{display:block;font-size:12px;color:#405c59;margin-bottom:12px}
+.case-flow strong{display:block;font-size:16px;line-height:1.4}
+.case-flow p,.case-takeaways p{font-size:14px;line-height:1.75;color:#34494b;margin-top:8px}
+.case-takeaways{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin:24px 0}
+.case-takeaways strong{display:block;color:#18272a;margin-bottom:6px}
+.case-engineering{border-block:1px solid #a8b8b2}
+.case-engineering>summary{display:flex;align-items:center;justify-content:space-between;gap:20px;cursor:pointer;list-style:none;font-size:15px;font-weight:600;padding:20px 0;min-height:48px}
+.case-engineering>summary::-webkit-details-marker{display:none}
+.case-expand{font-size:25px;font-weight:400;transition:transform .15s}
+.case-engineering[open] .case-expand{transform:rotate(45deg)}
+.case-engineering .case-chapters{margin-top:8px}
+.case-engineering .case-validation{margin-bottom:24px}
+@media(max-width:767px){.case-flow ol{grid-template-columns:1fr 1fr}.case-flow li:nth-child(2){border-right:1px solid #a8b8b2}.case-takeaways{grid-template-columns:1fr;gap:12px}.case-flow li{padding:14px 12px}.case-flow strong{font-size:14px}.case-flow p{font-size:13px}}
+@media(prefers-reduced-motion:reduce){.case-expand{transition:none}}
