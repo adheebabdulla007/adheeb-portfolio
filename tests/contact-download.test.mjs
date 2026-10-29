@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 const base=process.env.QA_URL||'http://127.0.0.1:8777/';
 const expected=await readFile(new URL('../assets/AdheebResume.pdf',import.meta.url));
-for(const [engine,type] of Object.entries({chromium,firefox,webkit})){
+for(const [engine,type] of Object.entries({chromium,firefox,webkit}).filter(([name])=>!process.env.QA_ENGINE || name===process.env.QA_ENGINE)){
  const browser=await type.launch();
  try {for(const width of [320,768,1440]){
   const page=await browser.newPage({viewport:{width,height:900},reducedMotion:'reduce'});
@@ -14,6 +14,7 @@ for(const [engine,type] of Object.entries({chromium,firefox,webkit})){
    assert.equal(download.suggestedFilename(),'AdheebAbdullaResume.pdf');
    assert.ok((await readFile(await download.path())).equals(expected));
   }
+  await page.locator('.contact-compose > summary').click();
   await page.locator('#contact-name').fill('Recruiter & Company');
   await page.locator('#contact-email').fill('recruiter@example.com');
   const message='Role: Engineer + integration\nLocation: UAE & India\nDetails: #123, 100%';

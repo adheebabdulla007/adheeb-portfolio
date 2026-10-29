@@ -2,7 +2,7 @@ import {chromium, firefox, webkit} from 'playwright';
 import assert from 'node:assert/strict';
 
 const base = process.env.QA_URL || 'http://127.0.0.1:8777/';
-for (const [engine, type] of Object.entries({chromium, firefox, webkit})) {
+for (const [engine, type] of Object.entries({chromium, firefox, webkit}).filter(([name])=>!process.env.QA_ENGINE || name===process.env.QA_ENGINE)) {
   const browser = await type.launch();
   try {
     for (const [width,height] of [[320,900],[767,900],[768,900],[1440,900],[844,390],[1024,600]]) {
@@ -18,9 +18,8 @@ for (const [engine, type] of Object.entries({chromium, firefox, webkit})) {
         // A deep link must bring the target into the viewport, including the phone carousel.
         assert.ok(box.x < width && box.x + box.width > 0, `${engine} ${width} ${hash} offscreen horizontally`);
       }
-      for (const id of ['gcc','erp','pursuit','research']) {
-        await page.locator('[data-filter="research"]').click();
-        await page.locator(`.capability-shortcuts [data-project-link="${id}"]`).click();
+      for (const id of ['gcc','erp','pursuit']) {
+        await page.locator(`.skill-groups [data-project-link="${id}"]`).click();
         assert.equal(new URL(page.url()).hash, '#' + id);
         assert.ok(await page.locator(`#${id}-details`).evaluate(e=>e.open));
         const rect = await page.locator('#' + id).boundingBox();
@@ -29,8 +28,7 @@ for (const [engine, type] of Object.entries({chromium, firefox, webkit})) {
         assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth <= innerWidth+1));
         await page.locator(`[data-close-project="${id}-details"]`).click();
       }
-      await page.locator('[data-filter="research"]').click();
-      await page.getByRole('link',{name:'Back to the GCC project summary',exact:true}).click();
+      await page.getByRole('link',{name:'Back to the application',exact:true}).click();
       assert.equal(await page.locator('#gcc').isVisible(),true);
       assert.equal(await page.locator('#gcc-details').evaluate(e=>e.open),true);
       assert.equal(new URL(page.url()).hash,'#gcc');
@@ -44,7 +42,7 @@ for (const [engine, type] of Object.entries({chromium, firefox, webkit})) {
         'https://wa.me/919400727023',
         'tel:+919400727023'
       ]);
-      console.log(`${engine} ${width}x${height}: all ${internal.length} anchor destinations, four filtered project shortcuts, résumé and contact destinations PASS`);
+      console.log(`${engine} ${width}x${height}: all ${internal.length} anchor destinations, three project shortcuts, résumé and contact destinations PASS`);
       await page.close();
     }
   } finally { await browser.close(); }
